@@ -3,7 +3,7 @@
 import prisma from "@/db/prisma"
 import { z } from "zod"
 import fs from 'fs/promises'
-import { redirect } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 
 const fileSchema = z.instanceof(File,{message:"Required"})
 const imageSchema = fileSchema.refine(file => file.size === 0 || file.type.startsWith("image/"))
@@ -35,6 +35,7 @@ export async function addProduct(prevState:unknown,formData:FormData) {
 
     await prisma.product.create({
         data:{
+            isAvailableForPurchase:false,
             name:data.name,
             description:data.description,
             priceInCents:data.priceInCents,
@@ -44,4 +45,13 @@ export async function addProduct(prevState:unknown,formData:FormData) {
     })
 
     redirect('/admin/products')
+}
+
+export async function toggleProductAvailability(id:string, isAvailableForPurchase:boolean){
+    await prisma.product.update({where:{id}, data:{isAvailableForPurchase}})
+}
+
+export async function deleteProduct(id:string){
+    const product = await prisma.product.delete({where:{id}})
+    if(product == null) return notFound()
 }
