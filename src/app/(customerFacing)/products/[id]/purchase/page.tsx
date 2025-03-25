@@ -25,6 +25,6 @@ export default async function PurchasePage({params:{id},}:{params:{id:string}}){
         <CheckoutForm
         product={product}
         clientSecret={paymentIntent.client_secret}
-      />
+    />
     )
 }
